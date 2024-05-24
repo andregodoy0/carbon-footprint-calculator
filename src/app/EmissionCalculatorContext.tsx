@@ -33,6 +33,7 @@ interface ChangeTransportAmountAction {
 }
 interface CleanStateAction {
   type: 'clean'
+  data: undefined
 }
 
 type DispatchActions = SetEmissionsAction | AddNextEmissionAction | RemoveNextEmissionAction | ChangeTransportAmountAction | CleanStateAction
@@ -64,7 +65,6 @@ export const useCalculatorContext = () => {
 }
 
 const contextReducer = (state: EmissionCalculatorContextType, action: DispatchActions): EmissionCalculatorContextType => {
-  console.log(action.type, action.data?.transportIndex, action.data)
   switch (action.type) {
     case 'set_emissions':
       const currentTransport = {
@@ -84,9 +84,9 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         const updatedSelectedEmissions = [...currentTransport.selectedEmissions.slice(0, parentEmissionIndex + 1)]
         updatedSelectedEmissions.push(action.data.emission)
         state.transportModes[action.data.transportIndex]!.selectedEmissions = updatedSelectedEmissions
-        return {
-          ...state,
-        }
+      }
+      return {
+        ...state,
       }
     }
     case 'remove_next_emissions': {
@@ -97,9 +97,9 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         const currentEmissionIndex = currentTransport.selectedEmissions.findIndex(({ id }) => id === action.data.emissionId)
         const updatedSelectedEmissions = [...currentTransport.selectedEmissions.slice(0, currentEmissionIndex + 1)]
         state.transportModes[action.data.transportIndex]!.selectedEmissions = updatedSelectedEmissions
-        return {
-          ...state,
-        }
+      }
+      return {
+        ...state,
       }
     }
     case 'change_transport_amount':
