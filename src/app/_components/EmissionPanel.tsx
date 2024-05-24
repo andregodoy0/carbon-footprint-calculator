@@ -1,24 +1,43 @@
-import { EMISSION_FACTORS } from '~/server/emission_factors'
+'use client'
+import { useCalculatorContext } from '../EmissionCalculatorContext'
 import CarbonSource from './CarbonSource'
 
 const EmissionPanel = () => {
-  const fuelEmission = EMISSION_FACTORS.find(({ id }) => id === 2)!
+  const {
+    dispatch,
+    state: { transportModes },
+  } = useCalculatorContext()
+
   return (
     <>
-      <h1 className="text-2xl font-bold">Find out your car carbon footprint!</h1>
-      <div className="grid w-full grid-cols-4 justify-between">
-        <div className="container">
-          <div className="">
-            <h2 className="pt-4 text-xl">{fuelEmission.name}</h2>
-            <div className="flex flex-col">
-              by {fuelEmission.property}
-              <CarbonSource source={fuelEmission.config} />
-            </div>
+      <h1 className="text-2xl font-bold">Find out your transportation carbon footprint!</h1>
+      <div className="flex w-full justify-between">
+        <div className="w-full mr-4">
+          <div className="mb-2">
+            <span className="text-lg">Select the amout of vehicles in your household:</span>
+            <select
+              className="select select-bordered"
+              onChange={(e) => dispatch({ type: 'change_transport_amount', data: { totalTransports: parseInt(e.target.value) } })}
+              defaultValue={transportModes.length}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
           </div>
+          {transportModes?.map(({ selectedEmissions }, transportIndex) => (
+            <div key={transportIndex} className="card card-bordered border-gray-700">
+              {selectedEmissions.map((source, index) => (
+                <CarbonSource key={index} source={source} transportIndex={transportIndex} />
+              ))}
+            </div>
+          ))}
         </div>
-        <div className="col-end-5 min-w-40 text-center">
-          <h2 className="text-2xl">Total</h2>
-          <div>
+        <div className="justify-end min-w-60 w-60 text-center card p-4 card-bordered border-gray-700">
+          <h2 className="text-2xl card-title">Total</h2>
+          <div className="card-body">
             <span className="font-bold">CO2e/yr</span>
           </div>
         </div>

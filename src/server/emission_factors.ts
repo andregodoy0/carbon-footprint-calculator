@@ -1,26 +1,25 @@
-export const EMISSION_EQUIVALENCY = Object.freeze({
-  CH4_factor: 25,
-  N2O_factor: 298,
-})
+// CO2, CH4, N2O
+export const EMISSION_EQUIVALENCY = Object.freeze([1, 25, 298])
 
 interface EmissionConfig {
   name: string
   unit: 'gallon' | 'scf' | 'g/mile'
   factor: [number, number, number] // [CO2, CH4, N2O] emissions
-  subconfig?: EmissionFactor['id']
+  suboption?: EmissionFactor['id']
 }
 export interface EmissionFactor {
   id: number
   name: string
   property: string
-  config: EmissionConfig[]
+  multiplier?: string
+  options: EmissionConfig[]
 }
 export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
   {
     id: 2,
     name: 'Mobile Combustion CO2',
     property: 'Fuel Type',
-    config: [
+    options: [
       { name: 'Aviation Gasoline', factor: [8.31, 0, 0], unit: 'gallon' },
       { name: 'Biodiesel (100%)', factor: [9.45, 0, 0], unit: 'gallon' },
       { name: 'Compressed Natural Gas (CNG)', factor: [0.05444, 0, 0], unit: 'scf' },
@@ -29,7 +28,7 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
       { name: 'Kerosene-Type Jet Fuel', factor: [9.75, 0, 0], unit: 'gallon' },
       { name: 'Liquefied Natural Gas (LNG)', factor: [4.5, 0, 0], unit: 'gallon' },
       { name: 'Liquefied Petroleum Gases (LPG)', factor: [5.68, 0, 0], unit: 'gallon' },
-      { name: 'Motor Gasoline', factor: [8.78, 0, 0], unit: 'gallon', subconfig: 3 },
+      { name: 'Motor Gasoline', factor: [8.78, 0, 0], unit: 'gallon', suboption: 3 },
       { name: 'Residual Fuel Oil', factor: [11.27, 0, 0], unit: 'gallon' },
     ],
   },
@@ -37,38 +36,19 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 3,
     name: 'Mobile Combustion CH4 and N2O for On-Road Gasoline Vehicles',
     property: 'Vehicle Type',
-    config: [
-      {
-        name: 'Gasoline Passenger Cars',
-        factor: [0, 0, 0],
-        unit: 'g/mile',
-        subconfig: 31,
-      },
-      {
-        name: 'Gasoline Light-Duty Trucks (Vans, Pickup Trucks, SUVs)',
-        factor: [0, 0, 0],
-        unit: 'g/mile',
-        subconfig: 32,
-      },
-      {
-        name: 'Gasoline Heavy-Duty Vehicles',
-        factor: [0, 0, 0],
-        unit: 'g/mile',
-        subconfig: 33,
-      },
-      {
-        name: 'Gasoline Motorcycles',
-        factor: [0, 0, 0],
-        unit: 'g/mile',
-        subconfig: 34,
-      },
+    options: [
+      { name: 'Gasoline Passenger Cars', factor: [0, 0, 0], unit: 'g/mile', suboption: 31 },
+      { name: 'Gasoline Light-Duty Trucks (Vans, Pickup Trucks, SUVs)', factor: [0, 0, 0], unit: 'g/mile', suboption: 32 },
+      { name: 'Gasoline Heavy-Duty Vehicles', factor: [0, 0, 0], unit: 'g/mile', suboption: 33 },
+      { name: 'Gasoline Motorcycles', factor: [0, 0, 0], unit: 'g/mile', suboption: 34 },
     ],
   },
   {
     id: 31,
     name: 'Gasoline Passenger Cars',
     property: 'Year',
-    config: [
+    multiplier: 'Average yearly mileage',
+    options: [
       { name: '1973-1974', factor: [0, 0.1696, 0.0197], unit: 'g/mile' },
       { name: '1975', factor: [0, 0.1423, 0.0443], unit: 'g/mile' },
       { name: '1976-1977', factor: [0, 0.1406, 0.0458], unit: 'g/mile' },
@@ -111,7 +91,8 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 32,
     name: 'Gasoline Light-Duty Trucks (Vans, Pickup Trucks, SUVs)',
     property: 'Year',
-    config: [
+    multiplier: 'Average yearly mileage',
+    options: [
       { name: '1973-1974', factor: [0, 0.1908, 0.0218], unit: 'g/mile' },
       { name: '1975', factor: [0, 0.1634, 0.0513], unit: 'g/mile' },
       { name: '1976', factor: [0, 0.1594, 0.0555], unit: 'g/mile' },
@@ -157,7 +138,8 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 33,
     name: 'Gasoline Heavy-Duty Vehicles',
     property: 'Year',
-    config: [
+    multiplier: 'Average yearly mileage',
+    options: [
       { name: '≤1980', factor: [0, 0.4604, 0.0497], unit: 'g/mile' },
       { name: '1981-1984', factor: [0, 0.4492, 0.0538], unit: 'g/mile' },
       { name: '1985-1986', factor: [0, 0.409, 0.0515], unit: 'g/mile' },
@@ -195,7 +177,8 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 34,
     name: 'Gasoline Motorcycles',
     property: 'Year',
-    config: [
+    multiplier: 'Average yearly mileage',
+    options: [
       { name: '1960-1995', factor: [0, 0.007, 0.0083], unit: 'g/mile' },
       { name: '1996-2005', factor: [0, 0.0, 0.0], unit: 'g/mile' },
       { name: '2006-2020', factor: [0, 0.007, 0.0083], unit: 'g/mile' },
