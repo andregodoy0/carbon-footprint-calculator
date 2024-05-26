@@ -1,7 +1,7 @@
 'use client'
 
 import { useReducer, type ReactNode, createContext, useContext } from 'react'
-import { EMISSION_EQUIVALENCY, EMISSION_FACTORS, EmissionFactor } from '~/server/emission_factors'
+import { EMISSION_EQUIVALENCY, EMISSION_FACTORS, type EmissionFactor } from '~/server/emission_factors'
 
 interface AddNextEmissionAction {
   type: 'add_next_emission'
@@ -62,6 +62,7 @@ export const initalState: EmissionCalculatorContextType = {
 }
 const EmissionCalculatorContext = createContext({
   state: initalState,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   dispatch: (() => {}) as React.Dispatch<DispatchActions>,
 })
 
@@ -87,7 +88,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
           selectedFactor: action.data.emission.options[0]!.factor,
           multiplier: 1,
         })
-        state.transportModes[action.data.transportIndex]! = updatedSelectedEmissions
+        state.transportModes[action.data.transportIndex] = updatedSelectedEmissions
       }
       return {
         ...state,
@@ -100,7 +101,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         const currentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.emissionId)
         const updatedSelectedEmissions = [...currentTransport.slice(0, currentEmissionIndex + 1)]
         updatedSelectedEmissions[currentEmissionIndex]!.selectedFactor = action.data.currentFactor
-        state.transportModes[action.data.transportIndex]! = updatedSelectedEmissions
+        state.transportModes[action.data.transportIndex] = updatedSelectedEmissions
       }
       return {
         ...state,
@@ -126,7 +127,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         currentEmission.multiplier = action.data.multiplier
         currentEmission.totalEmissions = getTotalCO2eForEmission(currentEmission.selectedFactor, currentEmission.multiplier)
         currentTransport[currentEmissionIndex] = currentEmission
-        state.transportModes[action.data.transportIndex]! = currentTransport
+        state.transportModes[action.data.transportIndex] = currentTransport
       }
       return {
         ...state,
@@ -137,7 +138,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
   }
 }
 
-const getTotalCO2eForEmission = (factor: number[], multiplier: number = 1) => {
+const getTotalCO2eForEmission = (factor: number[], multiplier = 1) => {
   return (factor[0]! * EMISSION_EQUIVALENCY[0]! + factor[1]! * EMISSION_EQUIVALENCY[1]! + factor[2]! * EMISSION_EQUIVALENCY[2]!) * multiplier
 }
 

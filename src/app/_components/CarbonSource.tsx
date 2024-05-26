@@ -11,17 +11,19 @@ const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transp
   useEffect(() => {
     if (selected !== undefined) {
       if (source.emission.options[selected]?.suboption !== undefined) {
-        fetchEmisisonFactor(source.emission.options[selected]!.suboption!).then((fuelEmission) =>
-          dispatch({
-            type: 'add_next_emission',
-            data: {
-              transportIndex,
-              emission: fuelEmission,
-              parentId: source.emission.id,
-              currentFactor: source.emission.options[selected]!.factor,
-            },
-          })
-        )
+        fetchEmisisonFactor(source.emission.options[selected]!.suboption!)
+          .then((fuelEmission) =>
+            dispatch({
+              type: 'add_next_emission',
+              data: {
+                transportIndex,
+                emission: fuelEmission,
+                parentId: source.emission.id,
+                currentFactor: source.emission.options[selected]!.factor,
+              },
+            })
+          )
+          .catch(() => console.error('Error'))
       } else {
         dispatch({
           type: 'remove_next_emissions',
@@ -33,11 +35,11 @@ const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transp
         })
       }
     }
-  }, [selected])
+  }, [selected, dispatch, source.emission.id, source.emission.options, transportIndex])
 
   useEffect(() => {
     dispatch({ type: 'change_transport_multiplier', data: { emissionId: source.emission.id, multiplier, transportIndex } })
-  }, [multiplier])
+  }, [multiplier, dispatch, source.emission.id, transportIndex])
 
   return (
     <div className="p-2">

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { EmissionData, useCalculatorContext } from '../EmissionCalculatorContext'
+import { type EmissionData, useCalculatorContext } from '../EmissionCalculatorContext'
 import CarbonSource from './CarbonSource'
 
 const calculateTotalEmissions = (transportModes: EmissionData[][]) => {
