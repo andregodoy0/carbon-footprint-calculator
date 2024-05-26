@@ -1,4 +1,4 @@
-import EmissionCalculatorProvider, { initalState } from './EmissionCalculatorContext'
+import EmissionCalculatorProvider, { initalState } from './EmissionCalculatorProvider'
 import EmissionPanel from './_components/EmissionPanel'
 
 export default function HomePage() {

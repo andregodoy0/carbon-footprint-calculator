@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { type EmissionData, useCalculatorContext } from '../EmissionCalculatorContext'
+import { type EmissionData, useCalculatorContext } from '../EmissionCalculatorProvider'
 import { fetchEmisisonFactor } from '../_utils/helpers'
 
 const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transportIndex: number }) => {
