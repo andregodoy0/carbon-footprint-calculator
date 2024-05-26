@@ -1,21 +1,15 @@
 'use client'
 
 import { useReducer, type ReactNode, createContext, useContext } from 'react'
-import { EMISSION_FACTORS, EmissionFactor } from '~/server/emission_factors'
+import { EMISSION_EQUIVALENCY, EMISSION_FACTORS, EmissionFactor } from '~/server/emission_factors'
 
-interface SetEmissionsAction {
-  type: 'set_emissions'
-  data: {
-    transportIndex: number
-    emission: EmissionCalculatorContextType['transportModes'][0]['selectedEmissions']
-  }
-}
 interface AddNextEmissionAction {
   type: 'add_next_emission'
   data: {
     transportIndex: number
-    emission: EmissionCalculatorContextType['transportModes'][0]['selectedEmissions'][0]
+    emission: EmissionCalculatorContextType['transportModes'][0][0]['emission']
     parentId: number
+    currentFactor: [number, number, number]
   }
 }
 interface RemoveNextEmissionAction {
@@ -23,6 +17,7 @@ interface RemoveNextEmissionAction {
   data: {
     transportIndex: number
     emissionId: number
+    currentFactor: [number, number, number]
   }
 }
 interface ChangeTransportAmountAction {
@@ -31,29 +26,39 @@ interface ChangeTransportAmountAction {
     totalTransports: number
   }
 }
+interface ChangeTransportMultiplierAction {
+  type: 'change_transport_multiplier'
+  data: {
+    transportIndex: number
+    emissionId: number
+    multiplier: number
+  }
+}
 interface CleanStateAction {
   type: 'clean'
   data: undefined
 }
 
-type DispatchActions = SetEmissionsAction | AddNextEmissionAction | RemoveNextEmissionAction | ChangeTransportAmountAction | CleanStateAction
+type DispatchActions = AddNextEmissionAction | RemoveNextEmissionAction | ChangeTransportAmountAction | CleanStateAction | ChangeTransportMultiplierAction
+
+export interface EmissionData {
+  emission: EmissionFactor
+  selectedFactor: [number, number, number]
+  multiplier: number
+  totalEmissions?: number
+}
 
 type EmissionCalculatorContextType = {
-  transportModes: [
-    {
-      selectedEmissions: EmissionFactor[]
-      averageMileage: number
-      totalEmissions: number
-    },
-  ]
+  transportModes: [EmissionData[]]
 }
 const defaultTransportModeInitialEmission = {
-  selectedEmissions: [{ ...EMISSION_FACTORS[0] }] as EmissionFactor[],
-  averageMileage: 0,
-  totalEmissions: 0,
+  emission: { ...EMISSION_FACTORS[0]! } as EmissionFactor,
+  selectedFactor: EMISSION_FACTORS[0]!.options[0]!.factor,
+  multiplier: 1,
 }
+
 export const initalState: EmissionCalculatorContextType = {
-  transportModes: [{ ...defaultTransportModeInitialEmission }],
+  transportModes: [[{ ...defaultTransportModeInitialEmission }]],
 }
 const EmissionCalculatorContext = createContext({
   state: initalState,
@@ -66,46 +71,45 @@ export const useCalculatorContext = () => {
 
 const contextReducer = (state: EmissionCalculatorContextType, action: DispatchActions): EmissionCalculatorContextType => {
   switch (action.type) {
-    case 'set_emissions':
-      const currentTransport = {
-        ...state.transportModes[action.data.transportIndex],
-        selectedEmissions: action.data,
-      }
-      return {
-        ...state,
-      }
     case 'add_next_emission': {
       if (state.transportModes[action.data.transportIndex]) {
-        const currentTransport = {
-          ...state.transportModes[action.data.transportIndex]!,
-        }
-        const parentEmissionIndex = currentTransport.selectedEmissions.findIndex(({ id }) => id === action.data.parentId)
-        // removes all dependant emissions
-        const updatedSelectedEmissions = [...currentTransport.selectedEmissions.slice(0, parentEmissionIndex + 1)]
-        updatedSelectedEmissions.push(action.data.emission)
-        state.transportModes[action.data.transportIndex]!.selectedEmissions = updatedSelectedEmissions
+        const currentTransport = [...state.transportModes[action.data.transportIndex]!]
+        const parentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.parentId)
+        // also removes all dependant emissions
+        const updatedSelectedEmissions = [...currentTransport.slice(0, parentEmissionIndex + 1)]
+        updatedSelectedEmissions[parentEmissionIndex]!.selectedFactor = action.data.currentFactor
+        updatedSelectedEmissions[parentEmissionIndex]!.totalEmissions = getTotalCO2eForEmission(
+          action.data.currentFactor,
+          updatedSelectedEmissions[parentEmissionIndex]!.multiplier
+        )
+        updatedSelectedEmissions.push({
+          emission: action.data.emission,
+          selectedFactor: action.data.emission.options[0]!.factor,
+          multiplier: 1,
+        })
+        state.transportModes[action.data.transportIndex]! = updatedSelectedEmissions
       }
       return {
         ...state,
+        transportModes: [...state.transportModes],
       }
     }
     case 'remove_next_emissions': {
       if (state.transportModes[action.data.transportIndex]) {
-        const currentTransport = {
-          ...state.transportModes[action.data.transportIndex]!,
-        }
-        const currentEmissionIndex = currentTransport.selectedEmissions.findIndex(({ id }) => id === action.data.emissionId)
-        const updatedSelectedEmissions = [...currentTransport.selectedEmissions.slice(0, currentEmissionIndex + 1)]
-        state.transportModes[action.data.transportIndex]!.selectedEmissions = updatedSelectedEmissions
+        const currentTransport = [...state.transportModes[action.data.transportIndex]!]
+        const currentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.emissionId)
+        const updatedSelectedEmissions = [...currentTransport.slice(0, currentEmissionIndex + 1)]
+        updatedSelectedEmissions[currentEmissionIndex]!.selectedFactor = action.data.currentFactor
+        state.transportModes[action.data.transportIndex]! = updatedSelectedEmissions
       }
       return {
         ...state,
+        transportModes: [...state.transportModes],
       }
     }
     case 'change_transport_amount':
-      // console.log(action.data, state.transportModes.length)
       while (action.data.totalTransports > state.transportModes.length) {
-        state.transportModes.push({ ...defaultTransportModeInitialEmission })
+        state.transportModes.push([{ ...defaultTransportModeInitialEmission }])
       }
       if (action.data.totalTransports < state.transportModes.length) {
         const toRemove = state.transportModes.length - action.data.totalTransports
@@ -114,9 +118,27 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
       return {
         ...state,
       }
+    case 'change_transport_multiplier':
+      if (state.transportModes[action.data.transportIndex]) {
+        const currentTransport = [...state.transportModes[action.data.transportIndex]!]
+        const currentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.emissionId)
+        const currentEmission = { ...currentTransport[currentEmissionIndex]!, multiplier: action.data.multiplier }
+        currentEmission.multiplier = action.data.multiplier
+        currentEmission.totalEmissions = getTotalCO2eForEmission(currentEmission.selectedFactor, currentEmission.multiplier)
+        currentTransport[currentEmissionIndex] = currentEmission
+        state.transportModes[action.data.transportIndex]! = currentTransport
+      }
+      return {
+        ...state,
+        transportModes: [...state.transportModes],
+      }
     case 'clean':
-      return initalState
+      return { ...initalState }
   }
+}
+
+const getTotalCO2eForEmission = (factor: number[], multiplier: number = 1) => {
+  return (factor[0]! * EMISSION_EQUIVALENCY[0]! + factor[1]! * EMISSION_EQUIVALENCY[1]! + factor[2]! * EMISSION_EQUIVALENCY[2]!) * multiplier
 }
 
 const EmissionCalculatorProvider = ({ children, context }: { children: ReactNode; context: EmissionCalculatorContextType }) => {

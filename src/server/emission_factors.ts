@@ -11,7 +11,7 @@ export interface EmissionFactor {
   id: number
   name: string
   property: string
-  multiplier?: string
+  multiplierDescription?: string
   options: EmissionConfig[]
 }
 export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
@@ -19,6 +19,7 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 2,
     name: 'Mobile Combustion CO2',
     property: 'Fuel Type',
+    multiplierDescription: 'Average yearly mileage',
     options: [
       { name: 'Aviation Gasoline', factor: [8.31, 0, 0], unit: 'gallon' },
       { name: 'Biodiesel (100%)', factor: [9.45, 0, 0], unit: 'gallon' },
@@ -47,7 +48,6 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 31,
     name: 'Gasoline Passenger Cars',
     property: 'Year',
-    multiplier: 'Average yearly mileage',
     options: [
       { name: '1973-1974', factor: [0, 0.1696, 0.0197], unit: 'g/mile' },
       { name: '1975', factor: [0, 0.1423, 0.0443], unit: 'g/mile' },
@@ -91,7 +91,6 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 32,
     name: 'Gasoline Light-Duty Trucks (Vans, Pickup Trucks, SUVs)',
     property: 'Year',
-    multiplier: 'Average yearly mileage',
     options: [
       { name: '1973-1974', factor: [0, 0.1908, 0.0218], unit: 'g/mile' },
       { name: '1975', factor: [0, 0.1634, 0.0513], unit: 'g/mile' },
@@ -138,7 +137,6 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 33,
     name: 'Gasoline Heavy-Duty Vehicles',
     property: 'Year',
-    multiplier: 'Average yearly mileage',
     options: [
       { name: '≤1980', factor: [0, 0.4604, 0.0497], unit: 'g/mile' },
       { name: '1981-1984', factor: [0, 0.4492, 0.0538], unit: 'g/mile' },
@@ -177,7 +175,6 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 34,
     name: 'Gasoline Motorcycles',
     property: 'Year',
-    multiplier: 'Average yearly mileage',
     options: [
       { name: '1960-1995', factor: [0, 0.007, 0.0083], unit: 'g/mile' },
       { name: '1996-2005', factor: [0, 0.0, 0.0], unit: 'g/mile' },

@@ -1,12 +1,26 @@
 'use client'
-import { useCalculatorContext } from '../EmissionCalculatorContext'
+import { useEffect, useState } from 'react'
+import { EmissionData, useCalculatorContext } from '../EmissionCalculatorContext'
 import CarbonSource from './CarbonSource'
+
+const calculateTotalEmissions = (transportModes: EmissionData[][]) => {
+  return transportModes
+    .reduce((total, transport) => {
+      total += transport.reduce((acc, { totalEmissions }) => acc + (totalEmissions ?? 0), 0)
+      return total
+    }, 0)
+    .toFixed(2)
+}
 
 const EmissionPanel = () => {
   const {
     dispatch,
     state: { transportModes },
   } = useCalculatorContext()
+  const [totalemission, setTotalEmissions] = useState(calculateTotalEmissions(transportModes))
+  useEffect(() => {
+    setTotalEmissions(calculateTotalEmissions(transportModes))
+  }, [transportModes])
 
   return (
     <>
@@ -18,7 +32,7 @@ const EmissionPanel = () => {
             <select
               className="select select-bordered"
               onChange={(e) => dispatch({ type: 'change_transport_amount', data: { totalTransports: parseInt(e.target.value) } })}
-              defaultValue={transportModes.length}
+              value={transportModes.length}
             >
               <option value="1">1</option>
               <option value="2">2</option>
@@ -27,7 +41,7 @@ const EmissionPanel = () => {
               <option value="5">5</option>
             </select>
           </div>
-          {transportModes?.map(({ selectedEmissions }, transportIndex) => (
+          {transportModes?.map((selectedEmissions, transportIndex) => (
             <div key={transportIndex} className="card card-bordered border-gray-700">
               {selectedEmissions.map((source, index) => (
                 <CarbonSource key={index} source={source} transportIndex={transportIndex} />
@@ -37,7 +51,8 @@ const EmissionPanel = () => {
         </div>
         <div className="justify-end min-w-60 w-60 text-center card p-4 card-bordered border-gray-700">
           <h2 className="text-2xl card-title">Total</h2>
-          <div className="card-body">
+          <div className="card-body flex flex-row items-baseline m-auto">
+            <span className="text-3xl">{totalemission}</span>
             <span className="font-bold">CO2e/yr</span>
           </div>
         </div>
