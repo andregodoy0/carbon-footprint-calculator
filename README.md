@@ -1,29 +1,43 @@
-# Create T3 App
+# Sinai - personal carbon footprint calculator
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This is a personal carbon calculator based on the [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
-## What's next? How do I make an app with this?
+# How to Setup
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+First you'll need [Node.js](https://nodejs.org/) installed and running on your machine. The second step is to setup the Environment variables in the `.env` file. You can just rename the `.env.example` as the only variable used for now is `URL` which already have a value.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+After these steps, in the root folder of the directory, run the following commands:
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+1. Install PNPM globaly:
 
-## Learn More
+   ```
+   npm install -g pnpm
+   ```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+2. Install the project dependencies:
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+   ```
+   pnpm install
+   ```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+3. Now you should be ready to start the application:
 
-## How do I deploy this?
+   ```
+   pnpm build && pnpm start
+   ```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+   - To start it in development mode (and auto-reload when changes are made), please use this instead:
+
+     ```
+     pnpm dev
+     ```
+
+   It should now be acessible at http://localhost:3000/
+
+# Testing
+
+There is an issue with NextJS Typescript and the test setup that I was not able to find a good solution for. In the `tsconfig.json file, NextJS uses `"jsx": "preserve"`, but for the tests to run correctly this value should be changed to "jsx": "react-jsx" first. Do this and then run:
+
+```
+pnpm test
+```
