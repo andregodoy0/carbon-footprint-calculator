@@ -19,7 +19,7 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     id: 2,
     name: 'Mobile Combustion CO2',
     property: 'Fuel Type',
-    multiplierDescription: 'Average yearly mileage',
+    multiplierDescription: 'Average yearly units',
     options: [
       { name: 'Aviation Gasoline', factor: [8.31, 0, 0], unit: 'gallon' },
       { name: 'Biodiesel (100%)', factor: [9.45, 0, 0], unit: 'gallon' },

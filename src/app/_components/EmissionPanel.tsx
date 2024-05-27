@@ -30,7 +30,7 @@ const EmissionPanel = () => {
           <div className="mb-2">
             <span className="text-lg">Select the amout of vehicles in your household:</span>
             <select
-              className="select select-bordered"
+              className="ml-2 select select-bordered"
               onChange={(e) => dispatch({ type: 'change_transport_amount', data: { totalTransports: parseInt(e.target.value) } })}
               value={transportModes.length}
             >
@@ -51,9 +51,11 @@ const EmissionPanel = () => {
         </div>
         <div className="justify-end min-w-60 w-60 text-center card p-4 card-bordered border-gray-700">
           <h2 className="text-2xl card-title">Total</h2>
-          <div className="card-body flex flex-row items-baseline m-auto">
+          <div className="card-body flex flex-row items-baseline m-auto px-1">
             <span className="text-3xl">{totalemission}</span>
-            <span className="font-bold">CO2e/yr</span>
+            <span className="font-bold">
+              CO<sub>2</sub>e/yr
+            </span>
           </div>
         </div>
       </div>

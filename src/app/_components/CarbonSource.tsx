@@ -30,7 +30,7 @@ const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transp
           data: {
             transportIndex,
             emissionId: source.emission.id,
-            currentFactor: source.emission.options[selected]!.factor,
+            currentFactor: source.emission.options[selected]?.factor ?? source.emission.options[0]!.factor,
           },
         })
       }
@@ -56,15 +56,20 @@ const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transp
             ))}
           </select>
           {source.emission.multiplierDescription && (
-            <input
-              type="number"
-              className="input input-bordered join-item"
-              placeholder={source.emission.multiplierDescription}
-              value={multiplier}
-              step={1}
-              onClick={(e) => setMultiplier((e.target as EventTarget & HTMLInputElement).valueAsNumber)}
-              onChange={(e) => setMultiplier(e.target.valueAsNumber)}
-            />
+            <>
+              <input
+                type="number"
+                className="input input-bordered join-item w-28"
+                placeholder={source.emission.multiplierDescription}
+                value={multiplier}
+                step={1}
+                onClick={(e) => setMultiplier((e.target as EventTarget & HTMLInputElement).valueAsNumber)}
+                onChange={(e) => setMultiplier(e.target.valueAsNumber)}
+              />
+              <div className="input input-bordered join-item w-80 leading-8 pt-1.5">
+                {source.emission.multiplierDescription} ({source.emission.options[selected]?.unit})
+              </div>
+            </>
           )}
         </div>
       </div>
