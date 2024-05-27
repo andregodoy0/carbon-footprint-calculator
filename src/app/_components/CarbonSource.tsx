@@ -66,6 +66,7 @@ const CarbonSource = ({ source, transportIndex }: { source: EmissionData; transp
                 onClick={(e) => setMultiplier((e.target as EventTarget & HTMLInputElement).valueAsNumber)}
                 onChange={(e) => setMultiplier(e.target.valueAsNumber)}
               />
+              {/* TODO: [UX improvement] Convert from average mileage and miles per gallon to units of gallons */}
               <div className="input input-bordered join-item w-80 leading-8 pt-1.5">
                 {source.emission.multiplierDescription} ({source.emission.options[selected]?.unit})
               </div>
