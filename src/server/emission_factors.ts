@@ -14,6 +14,17 @@ export interface EmissionFactor {
   multiplierDescription?: string
   options: EmissionConfig[]
 }
+/**
+ * Static partial data from Table 2 and Table 3 from the link:
+ * https://www.epa.gov/system/files/documents/2023-03/ghg_emission_factors_hub.pdf
+ * It is organized as data is connected to each other, being appended to data selected from
+ * Table 2 (the first object in this array, with id=2).
+ * if fetched from a database, and the `options` object is each row from the table. Tables that
+ * have further subdivisions like Table 3 can be organized as multiple object being linked with
+ * the `suboption` id within the `options` object.
+ * `factor` is the value from each pollutant CO2, CH4 and N2) respectively, which should be
+ * multiplied by EMISSION_EQUIVALENCY to get total CO2e.
+ */
 export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
   {
     id: 2,
@@ -22,13 +33,13 @@ export const EMISSION_FACTORS: readonly EmissionFactor[] = Object.freeze([
     multiplierDescription: 'Average yearly units',
     options: [
       { name: 'Aviation Gasoline', factor: [8.31, 0, 0], unit: 'gallon' },
-      { name: 'Biodiesel (100%)', factor: [9.45, 0, 0], unit: 'gallon' },
+      { name: 'Biodiesel (100%)', factor: [9.45, 0, 0], unit: 'gallon' }, // Link data from Table 4
       { name: 'Compressed Natural Gas (CNG)', factor: [0.05444, 0, 0], unit: 'scf' },
-      { name: 'Diesel Fuel', factor: [10.21, 0, 0], unit: 'gallon' },
-      { name: 'Ethanol (100%)', factor: [5.75, 0, 0], unit: 'gallon' },
+      { name: 'Diesel Fuel', factor: [10.21, 0, 0], unit: 'gallon' }, // Link data from Table 4
+      { name: 'Ethanol (100%)', factor: [5.75, 0, 0], unit: 'gallon' }, // Link data from Table 4
       { name: 'Kerosene-Type Jet Fuel', factor: [9.75, 0, 0], unit: 'gallon' },
-      { name: 'Liquefied Natural Gas (LNG)', factor: [4.5, 0, 0], unit: 'gallon' },
-      { name: 'Liquefied Petroleum Gases (LPG)', factor: [5.68, 0, 0], unit: 'gallon' },
+      { name: 'Liquefied Natural Gas (LNG)', factor: [4.5, 0, 0], unit: 'gallon' }, // Link data from Table 4
+      { name: 'Liquefied Petroleum Gases (LPG)', factor: [5.68, 0, 0], unit: 'gallon' }, // Link data from Table 4
       { name: 'Motor Gasoline', factor: [8.78, 0, 0], unit: 'gallon', suboption: 3 },
       { name: 'Residual Fuel Oil', factor: [11.27, 0, 0], unit: 'gallon' },
     ],

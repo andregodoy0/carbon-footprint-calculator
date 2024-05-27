@@ -54,7 +54,7 @@ type EmissionCalculatorContextType = {
 const defaultTransportModeInitialEmission = {
   emission: { ...EMISSION_FACTORS[0]! } as EmissionFactor,
   selectedFactor: EMISSION_FACTORS[0]!.options[0]!.factor,
-  multiplier: 1,
+  multiplier: EMISSION_FACTORS[0]!.multiplierDescription ? 0 : 1,
 }
 
 export const initalState: EmissionCalculatorContextType = {
@@ -72,6 +72,9 @@ export const useCalculatorContext = () => {
 
 const contextReducer = (state: EmissionCalculatorContextType, action: DispatchActions): EmissionCalculatorContextType => {
   switch (action.type) {
+    /**
+     * Adds a suboption to the selected vehicle
+     */
     case 'add_next_emission': {
       if (state.transportModes[action.data.transportIndex]) {
         const currentTransport = [...state.transportModes[action.data.transportIndex]!]
@@ -86,7 +89,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         updatedSelectedEmissions.push({
           emission: action.data.emission,
           selectedFactor: action.data.emission.options[0]!.factor,
-          multiplier: 1,
+          multiplier: action.data.emission.multiplierDescription ? 0 : 1,
         })
         state.transportModes[action.data.transportIndex] = updatedSelectedEmissions
       }
@@ -100,7 +103,9 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         const currentTransport = [...state.transportModes[action.data.transportIndex]!]
         const currentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.emissionId)
         const updatedSelectedEmissions = [...currentTransport.slice(0, currentEmissionIndex + 1)]
-        updatedSelectedEmissions[currentEmissionIndex]!.selectedFactor = action.data.currentFactor
+        const currentEmission = updatedSelectedEmissions[currentEmissionIndex]!
+        currentEmission.selectedFactor = action.data.currentFactor
+        currentEmission.totalEmissions = getTotalCO2eForEmission(currentEmission.selectedFactor, currentTransport[0]!.multiplier)
         state.transportModes[action.data.transportIndex] = updatedSelectedEmissions
       }
       return {
@@ -125,7 +130,7 @@ const contextReducer = (state: EmissionCalculatorContextType, action: DispatchAc
         const currentEmissionIndex = currentTransport.findIndex(({ emission: { id } }) => id === action.data.emissionId)
         const currentEmission = { ...currentTransport[currentEmissionIndex]!, multiplier: action.data.multiplier }
         currentEmission.multiplier = action.data.multiplier
-        currentEmission.totalEmissions = getTotalCO2eForEmission(currentEmission.selectedFactor, currentEmission.multiplier)
+        currentEmission.totalEmissions = getTotalCO2eForEmission(currentEmission.selectedFactor, currentTransport[0]!.multiplier)
         currentTransport[currentEmissionIndex] = currentEmission
         state.transportModes[action.data.transportIndex] = currentTransport
       }
