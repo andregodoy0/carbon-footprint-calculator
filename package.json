@@ -30,6 +30,7 @@
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
+    "@vitest/coverage-v8": "^1.6.0",
     "@vitest/ui": "^1.6.0",
     "daisyui": "^4.11.1",
     "eslint": "^8.57.0",

@@ -36,8 +36,11 @@ After these steps, in the root folder of the directory, run the following comman
 
 # Testing
 
-There is an issue with NextJS Typescript and the test setup that I was not able to find a good solution for. In the `tsconfig.json file, NextJS uses `"jsx": "preserve"`, but for the tests to run correctly this value should be changed to "jsx": "react-jsx" first. Do this and then run:
+To run the tests, run the following command:
 
 ```
 pnpm test
 ```
+
+- To see them in the Vitest UI: `pnpm test:ui`
+- To generate the test coverage: `pnpm coverage`; they will be printed in the terminal but also available in the `./coverage` folder

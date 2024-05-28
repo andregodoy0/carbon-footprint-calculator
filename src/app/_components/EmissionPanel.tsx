@@ -1,4 +1,6 @@
 'use client'
+
+import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { type EmissionData, useCalculatorContext } from '../EmissionCalculatorProvider'
 import CarbonSource from './CarbonSource'
